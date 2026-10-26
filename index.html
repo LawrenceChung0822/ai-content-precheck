@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Content Precheck — three-layer review funnel demo</title>
+  <meta name="description" content="Interactive demo of a three-layer content pre-review architecture: deterministic rules, simulated LLM semantic review, human arbitration. All data is synthetic.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div>
+        <h1>AI Content Precheck</h1>
+        <p class="tagline" data-i18n="tagline">Three-layer review funnel: deterministic rules → LLM semantic review → human arbitration.</p>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-simulated" title="Layer 2/3 results are pre-set, no real model is called">SIMULATED</span>
+        <span class="badge badge-rules" title="Layer 1 rules run for real in your browser">Layer 1 runs live</span>
+        <button id="lang-toggle" type="button" class="lang-btn" aria-label="Toggle language">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sample-list-wrap">
+      <h2 class="panel-label" data-i18n="samples">Samples</h2>
+      <nav id="sample-list" class="sample-list" aria-label="Sample list"></nav>
+      <p class="list-note" data-i18n="listNote">All 10 samples and product strings are invented. No company-internal information.</p>
+    </aside>
+
+    <section class="detail" id="detail">
+      <div class="detail-header">
+        <h2 id="sample-title">—</h2>
+        <span id="sample-category" class="badge"></span>
+      </div>
+      <p id="sample-scenario" class="scenario"></p>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3 data-i18n="entries">String batch</h3>
+        </div>
+        <table class="entries-table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Source (EN)</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody id="entries-body"></tbody>
+        </table>
+      </div>
+
+      <div class="panel layer-panel" id="layer1-panel">
+        <div class="panel-head">
+          <h3><span class="layer-num">1</span> <span data-i18n="layer1">Deterministic rules</span></h3>
+          <span id="layer1-verdict" class="verdict"></span>
+        </div>
+        <p class="layer-meta" data-i18n="layer1Meta">Runs live in your browser — zero tokens, milliseconds.</p>
+        <ul id="layer1-findings" class="findings"></ul>
+      </div>
+
+      <div class="panel layer-panel" id="layer2-panel">
+        <div class="panel-head">
+          <h3><span class="layer-num">2</span> <span data-i18n="layer2">LLM semantic review</span> <span class="badge badge-simulated badge-inline">SIMULATED</span></h3>
+          <span id="layer2-verdict" class="verdict"></span>
+        </div>
+        <p class="layer-meta" data-i18n="layer2Meta">Pre-set result — this demo never calls a real model.</p>
+        <ul id="layer2-findings" class="findings"></ul>
+      </div>
+
+      <div class="panel layer-panel" id="layer3-panel">
+        <div class="panel-head">
+          <h3><span class="layer-num">3</span> <span data-i18n="layer3">Human arbitration</span> <span class="badge badge-simulated badge-inline">SIMULATED</span></h3>
+          <span id="layer3-verdict" class="verdict"></span>
+        </div>
+        <p class="layer-meta" data-i18n="layer3Meta">Only escalates when Layer 2 is unsure or policy demands a human.</p>
+        <div id="layer3-content"></div>
+      </div>
+
+      <div class="panel gate-panel">
+        <div class="panel-head">
+          <h3 data-i18n="gate">Delivery gate</h3>
+        </div>
+        <p id="gate-hint" class="gate-hint"></p>
+        <textarea id="gate-reason" rows="2" data-i18n-ph="gatePh" placeholder="Warning samples may pass, but only with a recorded reason…"></textarea>
+        <button id="gate-submit" type="button" disabled data-i18n="gateBtn">Approve for delivery</button>
+        <p id="gate-feedback" class="gate-feedback"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p data-i18n="disclaimer">All sample data is synthetic; CloudNotes is an invented product. Layer 2/3 results are labeled SIMULATED. Layer 1 rules genuinely run in your browser.</p>
+    <p><a href="https://github.com/LawrenceChung0822/ai-content-precheck" target="_blank" rel="noopener">Source on GitHub</a> · <a href="https://lawrencechung0822.github.io" target="_blank" rel="noopener">Portfolio</a></p>
+  </footer>
+
+  <script src="js/rules-engine.js"></script>
+  <script src="js/mock-review.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

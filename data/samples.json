@@ -1,0 +1,171 @@
+{
+  "note": "All sample data is synthetic. Product 'CloudNotes' and all strings are invented for demonstration; no company-internal information.",
+  "samples": [
+    {
+      "id": "S01",
+      "category": "error",
+      "title_zh": "空译文：设置页三条字符串未翻译",
+      "title_en": "Empty targets: 3 untranslated settings strings",
+      "scenario_zh": "供应商交付的德语包里，同步相关文案直接留空，上线后界面会出现英文回退甚至空白按钮。",
+      "scenario_en": "The German package ships with sync-related strings left blank; production would fall back to English or render empty buttons.",
+      "entries": [
+        { "key": "settings.sync.title", "source": "Sync", "target": "" },
+        { "key": "settings.sync.enable", "source": "Enable sync", "target": "" },
+        { "key": "settings.sync.status.on", "source": "Sync is on", "target": "   " }
+      ],
+      "mockLayer2": { "verdict": "n/a", "note_zh": "Layer 1 已判定 Error，按设计不再送 LLM（规则不烧 Token，门禁也不放行）。", "note_en": "Layer 1 already returned Error; per design the string is not sent to the LLM (rules don't burn tokens; the gate won't pass it anyway)." }
+    },
+    {
+      "id": "S02",
+      "category": "error",
+      "title_zh": "占位符丢失：目标文少了 {count}",
+      "title_en": "Placeholder lost: {count} missing in target",
+      "scenario_zh": "源文带 {count} 占位符，法语译文把它翻译成了词组，运行时会显示字面量 {count} 或崩溃。",
+      "scenario_en": "The source uses {count}; the French target renders it as a word, so runtime shows the literal {count} or crashes.",
+      "entries": [
+        { "key": "notes.selected", "source": "{count} notes selected", "target": "Toutes les notes sélectionnées" },
+        { "key": "trash.empty_hint", "source": "Items in trash are deleted after {days} days", "target": "Les éléments de la corbeille sont supprimés après {jours} jours" }
+      ],
+      "mockLayer2": { "verdict": "n/a", "note_zh": "占位符属于可程序化检查项，Layer 1 拦截后不进入语义层。", "note_en": "Placeholder integrity is programmable; after the Layer 1 hit it never reaches the semantic layer." }
+    },
+    {
+      "id": "S03",
+      "category": "error",
+      "title_zh": "重复 Key：同一 key 两个不同译文",
+      "title_en": "Duplicate key: same key, two different targets",
+      "scenario_zh": "合并翻译记忆时，settings.sync.title 出现两次且译文不一致，运行时谁生效取决于文件顺序，属于典型合并事故。",
+      "scenario_en": "A TM merge produced settings.sync.title twice with different targets; which one wins depends on file order — a classic merge accident.",
+      "entries": [
+        { "key": "settings.sync.title", "source": "Sync", "target": "Synchronisieren", "note": "entry #1" },
+        { "key": "settings.sync.title", "source": "Sync", "target": "Synchronisation", "note": "entry #2" },
+        { "key": "settings.sync.subtitle", "source": "Keep your notes up to date", "target": "Halte deine Notizen aktuell" }
+      ],
+      "mockLayer2": { "verdict": "n/a", "note_zh": "结构性错误由规则层拦截，LLM 无法替代确定性检查。", "note_en": "Structural errors belong to the rules layer; an LLM cannot replace deterministic checks." }
+    },
+    {
+      "id": "S04",
+      "category": "error",
+      "title_zh": "歧义日期：3/14/26 是 3月14 还是 14月3？",
+      "title_en": "Ambiguous date: is 3/14/26 Mar 14 or the 14th month?",
+      "scenario_zh": "西语界面里出现美式短日期，MM/DD 在 DD/MM 习惯的市场会被读反，日程类功能直接产生错误认知。",
+      "scenario_en": "A US-style short date appears in the Spanish UI; in DD/MM markets users read it backwards — a direct comprehension bug in calendar features.",
+      "entries": [
+        { "key": "calendar.due_label", "source": "Due {date}", "target": "Vence el 3/14/26" },
+        { "key": "calendar.reminder_hint", "source": "Remind me on 2026-11-05", "target": "Recuérdame el 5/11/2026" }
+      ],
+      "mockLayer2": { "verdict": "n/a", "note_zh": "日期格式白名单是规则层的典型职责。", "note_en": "A date-format allowlist is a textbook rules-layer job." }
+    },
+    {
+      "id": "S05",
+      "category": "warning",
+      "title_zh": "标点与空格：感叹号前空格、双空格",
+      "title_en": "Punctuation & spacing: space before !, double spaces",
+      "scenario_zh": "法语排版习惯感叹号前加空格，但交付规范要求全语言统一无空格；另有两条混入双空格，属于可修复的排版瑕疵。",
+      "scenario_en": "French typography adds a space before !, but the style guide mandates none across languages; two strings also carry double spaces — fixable polish issues.",
+      "entries": [
+        { "key": "onboarding.done", "source": "You're all set!", "target": "Vous êtes prêt !" },
+        { "key": "sync.conflict_title", "source": "Sync conflict", "target": "Conflit  de synchronisation" },
+        { "key": "paywall.cta", "source": "Go Premium", "target": "Passer au  Premium" }
+      ],
+      "mockLayer2": { "verdict": "pass", "note_zh": "语义层复核：三条均为排版问题，译义正确，维持 Warning 放行建议。", "note_en": "Semantic review: all three are typographic; meaning is correct, so the Warning / pass-with-reason recommendation stands." }
+    },
+    {
+      "id": "S06",
+      "category": "warning",
+      "title_zh": "省略号不一致：… 与 ... 混用",
+      "title_en": "Ellipsis inconsistency: … vs ... mixed",
+      "scenario_zh": "同一版本内省略号风格不统一，规范要求单一省略符 U+2026，混用会在 UI 上产生粗细微差。",
+      "scenario_en": "Ellipsis style varies within one release; the spec requires U+2026 only — mixing shows subtle weight differences in UI.",
+      "entries": [
+        { "key": "more.menu", "source": "More...", "target": "Plus..." },
+        { "key": "loading.please_wait", "source": "Please wait...", "target": "Veuillez patienter…" },
+        { "key": "search.loading", "source": "Searching...", "target": "Recherche en cours..." }
+      ],
+      "mockLayer2": { "verdict": "pass", "note_zh": "语义层确认译义无误，风格问题建议 Warning + 批量修复。", "note_en": "Meaning verified correct; style drift → Warning with a batch-fix suggestion." }
+    },
+    {
+      "id": "S07",
+      "category": "warning",
+      "title_zh": "长度超限：按钮文案超出 UI 预算 40%",
+      "title_en": "Length overflow: button label exceeds UI budget by 40%",
+      "scenario_zh": "德语按钮文案按经验值超预算，可能截断或挤压相邻控件；需要 UX 确认是缩短文案还是加宽控件。",
+      "scenario_en": "The German button label exceeds the empirical budget and may truncate or crowd neighbors; UX must decide shorter copy vs wider control.",
+      "entries": [
+        { "key": "settings.backup_now", "source": "Back up now", "target": "Jetzt Sicherung erstellen", "budget": 18 },
+        { "key": "paywall.restore", "source": "Restore purchases", "target": "Käufe wiederherstellen", "budget": 18 }
+      ],
+      "mockLayer2": { "verdict": "warning", "note_zh": "语义层：译义正确但确认存在 UI 风险，建议 Warning 并附 UX 复核标记。", "note_en": "Meaning is correct but UI risk confirmed; keep Warning and tag for UX review." }
+    },
+    {
+      "id": "S08",
+      "category": "warning",
+      "title_zh": "术语漂移：同步 = Synch vs Synchronisation 混用",
+      "title_en": "Terminology drift: Synch vs Synchronisation mixed",
+      "scenario_zh": "术语库指定 Sync=Synchronisation，但包内混入 Synch 直译，同一功能两种叫法会直接损伤产品感。",
+      "scenario_en": "The glossary mandates Sync=Synchronisation, but Synch slips in — two names for one feature damage perceived quality.",
+      "entries": [
+        { "key": "settings.sync.title", "source": "Sync", "target": "Synch" },
+        { "key": "settings.sync.status.on", "source": "Sync is on", "target": "Die Synchronisation ist aktiv" },
+        { "key": "widget.sync_status", "source": "Last sync: {time}", "target": "Letzte Synchronisation: {time}" }
+      ],
+      "mockLayer2": { "verdict": "warning", "note_zh": "语义层与术语库比对：settings.sync.title 违反术语，其余两条合规。", "note_en": "Glossary cross-check: settings.sync.title violates the glossary; the other two comply." }
+    },
+    {
+      "id": "S09",
+      "category": "semantic",
+      "title_zh": "语义错译：Archive 被译成动词「存档动作」",
+      "title_en": "Semantic error: noun 'Archive' translated as an action verb",
+      "scenario_zh": "源文 Archive 是功能页签（名词），日语译成了「アーカイブする」（去归档）这一动作，用户会理解成点按后才会归档。",
+      "scenario_en": "The source 'Archive' is a noun tab; the Japanese target reads as the action 'archive it', implying tapping archives something.",
+      "entries": [
+        { "key": "tabs.archive", "source": "Archive", "target": "アーカイブする" },
+        { "key": "archive.empty_title", "source": "Nothing in Archive yet", "target": "アーカイブはまだ空です" }
+      ],
+      "mockLayer2": {
+        "verdict": "error",
+        "issues": [
+          {
+            "type": "semantic_mismatch",
+            "severity": "error",
+            "keys": ["tabs.archive"],
+            "message_zh": "词性错误：源文是名词页签，译文是动词短语（『アーカイブする』= 去归档）。建议改为名词「アーカイブ」。",
+            "message_en": "Wrong part of speech: source is a noun tab, target is a verb phrase ('アーカイブする' = go archive). Suggest the noun 「アーカイブ」."
+          }
+        ],
+        "confidence": 0.93,
+        "note_zh": "规则层无法判断词性与产品语境，这正是语义层的职责。",
+        "note_en": "Rules cannot judge part of speech in product context — exactly the semantic layer's job."
+      }
+    },
+    {
+      "id": "S10",
+      "category": "arbitration",
+      "title_zh": "人机仲裁：语气不一致，接受译文并更新风格指南",
+      "title_en": "Human arbitration: tone mismatch — accept, then update the style guide",
+      "scenario_zh": "西语推送文案整体偏正式，与产品「轻快」基调不一致；语义层标为 Warning，人工仲裁接受本版交付，同时把基调条款写进风格指南下一版。",
+      "scenario_en": "Spanish push copy is formal while the product voice is light; the semantic layer flags Warning. Human arbitration accepts this release and adds a voice clause to the next style guide.",
+      "entries": [
+        { "key": "push.reengage_title", "source": "We miss your notes", "target": "Extrañamos sus notas" },
+        { "key": "push.reengage_body", "source": "Come back and see what's new", "target": "Regrese para conocer las novedades" }
+      ],
+      "mockLayer2": {
+        "verdict": "warning",
+        "issues": [
+          {
+            "type": "tone_mismatch",
+            "severity": "warning",
+            "keys": ["push.reengage_title", "push.reengage_body"],
+            "message_zh": "译义正确，但使用 usted 正式体（Extrañamos sus notas），与产品轻快基调（tú 体）不一致。",
+            "message_en": "Meaning is correct, but usted formal register conflicts with the product's light voice (tú)."
+          }
+        ],
+        "confidence": 0.81
+      },
+      "mockLayer3": {
+        "decision": "accept_with_action",
+        "reason_zh": "推送已排期，本版接受交付；「营销文案默认 tú 体」写入风格指南 vNext，下一包起按新条款门禁。",
+        "reason_en": "Push is already scheduled; ship this release. 'Marketing copy defaults to tú' goes into style guide vNext and gates the next package."
+      }
+    }
+  ]
+}
