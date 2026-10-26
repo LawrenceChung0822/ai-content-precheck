@@ -9,7 +9,7 @@ An interactive demo of a **three-layer content pre-review architecture** for loc
 >
 > 全部样例数据均为虚构（产品 CloudNotes 及所有字符串为演示而造），不含任何公司内部信息。Layer 2/3 为预置结果并标注 **SIMULATED**；Layer 1 规则在浏览器中真实运行。
 
-**Live demo → [lawrencechung0822.github.io placeholder: enable Pages after push]**
+**Live demo → https://lawrencechung0822.github.io/ai-content-precheck/**
 
 ## Why not just let the LLM review everything? / 为什么不直接让 LLM 全审？
 
